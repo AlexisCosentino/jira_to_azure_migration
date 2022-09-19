@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
@@ -21,16 +22,33 @@ namespace Jira___Azure_migration
         {
             string created = ticketData["created"];
             var parsedDate = DateTime.Parse(created);
-            var  date = parsedDate.ToString("YYYY-MM-DD HH:mm:ss", CultureInfo.InvariantCulture);
-
+            var createdDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc).ToString("s") + ".000Z";
+            Console.WriteLine(createdDate);
             // I need --> 2022-09-15T14:03:21.42Z
 
-            Console.WriteLine($"la date qui sort est {created}, une fois parsé : {parsedDate}, et la très bizarre culture : {date}");
-            Console.WriteLine($"la date qui sort est {created.GetType()}, une fois parsé : {parsedDate.GetType()}, et voici la petite dernière {date.GetType()}");
+
+            foreach (var item in ticketData.Keys)
+            {
+                ticketData[item] = formatText(ticketData[item]);
+            }
 
 
-            string jsonToPost = "[{ \"op\": \"add\", \"path\": \"/fields/System.Title\", \"from\": null, \"value\": \"" + ticketData["summary"] + "\"}, { \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] + "\"}]";
+            string jsonToPost = "[{ \"op\": \"add\", \"path\": \"/fields/System.Title\", \"from\": null, \"value\": \"" + ticketData["summary"] + "\"}";
+            jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] + "\"} ";
+            jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.State\", \"from\": null, \"value\": \"Development in Progress\"}";
+            jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"from\": null, \"value\": \"" + createdDate + "\"}";
+            jsonToPost += "]";
+
+            Console.WriteLine(jsonToPost);
             return jsonToPost;
         }
+
+        public string formatText(string toformat)
+        {
+            toformat = toformat.Replace("\"", " ");
+            return toformat;
+        }
+
+
     }
 }

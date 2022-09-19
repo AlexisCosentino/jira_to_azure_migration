@@ -21,8 +21,7 @@ try
     var startConnect = new Connect_to_DB(pwd, db_name, db_hostname, db_username, query);
     var answerQuery = startConnect.start_connection();
     var token = get_credentials("azureToken");
-    var gonnaPost = new Post_To_Azure(token);
-
+    var createPBI = new Post_To_Azure(token);
 
 
 
@@ -35,7 +34,7 @@ try
     {
         var translation = new Translate_Jira_To_Azure(dict);
         string jsonToPost = translation.createJsonWillPostToAzure();
-        gonnaPost.post_to_azure(jsonToPost);
+        createPBI.post_to_azure(jsonToPost);
     }
 
 }
