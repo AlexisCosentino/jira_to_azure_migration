@@ -5,10 +5,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Jira___Azure_migration
 {
-    public class Patch_To_Azure
+    public class Patch_PBI_To_Azure
     {
         public const string BASE = "https://dev.azure.com";
         string PAT;
@@ -17,13 +18,14 @@ namespace Jira___Azure_migration
         public const string API = "bypassRules=true&api-version=6.0";
         public const string PROJECT = "TEST_ALEXIS";
 
-        public Patch_To_Azure(string token, string ID)
+        public Patch_PBI_To_Azure(string ID)
         {
-            this.PAT = token;
+            JObject data = JObject.Parse(File.ReadAllText("data.json"));
+            this.PAT = (string?)data["azureToken"];
             this.ID = ID;
         }
 
-        public void patch_to_azure(string jsonToPost)
+        public void patchPBIToAzure(string jsonToPost)
         {
             HttpClient client = new HttpClient();
 
@@ -52,11 +54,6 @@ namespace Jira___Azure_migration
                 dynamic wit = JsonConvert.DeserializeObject<object>(result);
                 Console.WriteLine(JsonConvert.SerializeObject(wit, Formatting.Indented));
             }
-
-            // Presss any key to exit
-            // TAKE OFF THIS LINE IF YOU WANT YOU WANT TRANSFER MASS DATA IN ONCE
-            Console.ReadLine();
-            /////////////////////////////////////////////////////////////////////
             client.Dispose();
         }
 

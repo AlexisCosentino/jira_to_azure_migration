@@ -13,6 +13,7 @@ namespace Jira___Azure_migration
         Post_PBI_To_Azure Post_PBI_To_Azure;
         Post_Comment_To_Azure_PBI Post_Comment_To_Azure_PBI;
         Translate_Jira_To_Azure Translate_Jira_To_Azure;
+        Patch_PBI_To_Azure Patch_PBI_To_Azure;
         public Migration()
         {
         }
@@ -30,7 +31,9 @@ namespace Jira___Azure_migration
                 Post_PBI_To_Azure = new Post_PBI_To_Azure();
                 Post_PBI_To_Azure.PostPBIToAzure(json);
                 string PBI_ID = Post_PBI_To_Azure.ID_of_PBI;
-                connection.query = $"SELECT jiraaction.actionbody FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED ASC;";
+                connection.query = $"SELECT jiraaction.actionbody FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
+                connection.query = $"SELECT jiraaction.actionbody, jiraaction.AUTHOR FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = 148 and project = 15000 ORDER BY jiraissue.CREATED DESC;";
+
                 var list_of_comments = connection.getListOfComments();
                 foreach (var comment in list_of_comments)
                 {
@@ -39,7 +42,23 @@ namespace Jira___Azure_migration
                     Post_Comment_To_Azure_PBI = new Post_Comment_To_Azure_PBI(PBI_ID);
                     Post_Comment_To_Azure_PBI.postCommentToAzurePBI(comment_json_to_post);
                 }
+
+
+/*              
+                THIS IS THE CODE TO UPDATE YOUR PBI IN CASE YOU NEED :)
+               
+                Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID);
+                string jsonToPatch = Translate_Jira_To_Azure.createJsonToPatchPBI();
+                Patch_PBI_To_Azure.patchPBIToAzure(jsonToPatch);
+*/
+
+                // Comment the next line if you want export mass data in once
+                Console.WriteLine("press ENTER to keep going");
+                Console.ReadLine();
             }
         }
     }
 }
+
+
+// query to get formatting data in description : "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;\r\n";

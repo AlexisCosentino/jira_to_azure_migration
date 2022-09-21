@@ -108,6 +108,8 @@ namespace Jira___Azure_migration
             finally
             {
                 conn.Close();
+                Console.WriteLine(JsonConvert.SerializeObject(queryAnswerList).ToString());
+
             }
             return queryAnswerList;
         }
