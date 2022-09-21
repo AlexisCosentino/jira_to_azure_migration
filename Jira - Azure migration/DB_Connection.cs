@@ -1,39 +1,27 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Xml;
+using Newtonsoft.Json.Linq;
 
 namespace Jira___Azure_migration
 {
-    public class Connect_to_DB
+    public class DB_Connection  
     {
         string username;
         string dbname;
         string hostname;
         string password;
-        string query;
-        Dictionary<string, Dictionary<string, string>> queryAnswerDict = new Dictionary<string, Dictionary<string, string>>() ;
+        public string query { get; set; }
 
 
-
-        public Connect_to_DB(string pwd, string db_name, string db_hostname, string db_username, string query)
+        public Dictionary<string, Dictionary<string, string>> getDictOfPBI()
         {
-            this.password = pwd;
-            this.query = query;
-            this.username = db_username;
-            this.dbname = db_name;
-            this.hostname = db_hostname;
-        }
-
-        public Dictionary<string, Dictionary<string, string>> start_connection()
-        {
+            get_credentials();
+            var queryAnswerDict = new Dictionary<string, Dictionary<string, string>>();
             SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
             try
             {
@@ -61,7 +49,7 @@ namespace Jira___Azure_migration
                         value_dict.Add("updated", reader[15].ToString());
                         value_dict.Add("dueDate", reader[16].ToString());
                         value_dict.Add("ProjectName", reader[31].ToString());
-                        this.queryAnswerDict.Add(ID, value_dict);
+                        queryAnswerDict.Add(ID, value_dict);
                     }
                 }
                 catch (Exception ex)
@@ -71,8 +59,7 @@ namespace Jira___Azure_migration
                 finally
                 {
                     reader.Close();
-                    var new_dict = toJson(queryAnswerDict);
-                    Console.WriteLine(new_dict.ToString());
+                    Console.WriteLine(JsonConvert.SerializeObject(queryAnswerDict).ToString());
                 }
             }
             catch (Exception ex)
@@ -86,9 +73,52 @@ namespace Jira___Azure_migration
             return queryAnswerDict;
         }
 
-        public string toJson(IDictionary dict)
+        public List<string> getListOfComments()
         {
-            return JsonConvert.SerializeObject(dict);
+            get_credentials();
+            List<string> queryAnswerList = new List<string>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        queryAnswerList.Add(reader[0].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return queryAnswerList;
+        }
+
+        private void get_credentials()
+        {
+            JObject data = JObject.Parse(File.ReadAllText("data.json"));
+            this.password = (string?)data["db_pwd"];
+            this.username = (string?)data["db_username"];
+            this.dbname = (string?)data["db_name"];
+            this.hostname = (string?)data["db_hostname"];
         }
     }
 }

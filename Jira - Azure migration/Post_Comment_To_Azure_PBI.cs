@@ -1,45 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.SqlServer.Server;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Jira___Azure_migration
 {
-    public class Post_To_Azure
+    public class Post_Comment_To_Azure_PBI
     {
         public const string BASE = "https://dev.azure.com";
         string PAT;
         public const string ORG = "IRIUMSOFTWARE";
         public const string API = "api-version=6.0";
         public const string PROJECT = "TEST_ALEXIS";
-        public List<string> WIT_TYPE = new List<string>{ "$Task", "$Product Backlog Item" };
+        public string ID_of_PBI;
 
-        public Post_To_Azure(string token)
+        public Post_Comment_To_Azure_PBI(string ID)
         {
-            this.PAT = token;
+            JObject data = JObject.Parse(File.ReadAllText("data.json"));
+            this.PAT = (string?)data["azureToken"];
+            this.ID_of_PBI = ID;
         }
 
-        public void post_to_azure(string jsonToPost)
+        public void postCommentToAzurePBI(string jsonComment)
         {
+             // REMINDER : When create the string content, dont use json-patch+json, and dont put bracket around the json to post
+
             HttpClient client = new HttpClient();
 
-            // Set Media Type of Response.
+             // Set Media Type of Response.
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // Generate base64 encoded authorization header.
+             // Generate base64 encoded authorization header.
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", PAT))));
 
             // Build the URI for creating Work Item.
-            string uri = String.Join("?", String.Join("/", BASE, ORG, PROJECT, "_apis/wit/workitems", WIT_TYPE[1]), API);
+            string uri = String.Join("?", String.Join("/", BASE, ORG, PROJECT, "_apis/wit/workItems", this.ID_of_PBI, "comments"), API + "-preview.3");
+
+            Console.WriteLine($"le json : {jsonComment}, l'uri est {uri}");
 
             // Create Request body in JSON format.
-            HttpContent content = new StringContent(jsonToPost, Encoding.UTF8, "application/json-patch+json");
+            HttpContent content = new StringContent(jsonComment, Encoding.UTF8, "application/json");
 
             // Call CreateWIT method.
             string result = CreateWIT(client, uri, content).Result;
@@ -47,20 +51,12 @@ namespace Jira___Azure_migration
             // Pretty print the JSON if result not empty or null.
             if (!String.IsNullOrEmpty(result))
             {
-                dynamic wit = JsonConvert.DeserializeObject<object>(result);
-                Console.WriteLine(JsonConvert.SerializeObject(wit, Formatting.Indented));
-                updateSameWIT(wit);
-                
+                 dynamic data = JsonConvert.DeserializeObject<object>(result);
+                 Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
             }
-
-            // Presss any key to exit
-            // TAKE OFF THIS LINE IF YOU WANT YOU WANT TRANSFER MASS DATA IN ONCE
-            Console.ReadLine();
-            /////////////////////////////////////////////////////////////////////
-            client.Dispose();
         }
 
-        public async Task<string> CreateWIT(HttpClient client,string uri , HttpContent content)
+        public async Task<string> CreateWIT(HttpClient client, string uri, HttpContent content)
         {
             try
             {
@@ -76,16 +72,6 @@ namespace Jira___Azure_migration
                 Console.WriteLine(ex.ToString());
                 return string.Empty;
             }
-        } // End of CreateWIT method
-
-        public void updateSameWIT(dynamic wit)
-        {
-            string ID = wit["id"].ToString();
-            string jsonToPost = "[{ \"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"from\": null, \"value\": \"2022-09-15T14:03:21.422Z\"}";
-            jsonToPost += "]";
-            var updateWIT = new Patch_To_Azure(PAT, ID);
-            updateWIT.patch_to_azure(jsonToPost);
-
         }
     }
 }
