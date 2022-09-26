@@ -21,7 +21,7 @@ namespace Jira___Azure_migration
         public void launchMigration()
         {
             connection = new DB_Connection();
-            connection.query = "SELECT TOP 1 * FROM jiraissue, project WHERE project.id=jiraissue.project and project.pname not like '%Hotline%' ORDER BY CREATED DESC;\r\n";
+            connection.query = "SELECT TOP 1 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;\r\n";
             var dict_of_pbi = connection.getDictOfPBI();
 
             foreach (var dict in dict_of_pbi.Values)
@@ -62,3 +62,13 @@ namespace Jira___Azure_migration
 
 // query to get formatting data in description : "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;\r\n";
 // query to get many data from comments : "SELECT jiraaction.actionbody, jiraaction.AUTHOR, jiraaction.CREATED FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = 148 and project = 15000 ORDER BY jiraissue.CREATED DESC;";
+
+
+// hotline project -> v9007   id#13301
+// intranet project ->
+// ne pas prendre les type de projet "intranet"
+// Trouver une query pour obtenir le lien des images
+// faire un fichier texte pour stocker toutes les query
+
+
+// SELECT [ID] ,[MIMETYPE] ,[FILENAME] FROM [Jira_Prod].[dbo].[fileattachment] Where issueid = 1000 and thumbnailable = 1;
