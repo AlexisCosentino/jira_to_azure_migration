@@ -32,7 +32,6 @@ namespace Jira___Azure_migration
                 Post_PBI_To_Azure.PostPBIToAzure(json);
                 string PBI_ID = Post_PBI_To_Azure.ID_of_PBI;
                 connection.query = $"SELECT jiraaction.actionbody FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
-                connection.query = $"SELECT jiraaction.actionbody, jiraaction.AUTHOR FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = 148 and project = 15000 ORDER BY jiraissue.CREATED DESC;";
 
                 var list_of_comments = connection.getListOfComments();
                 foreach (var comment in list_of_comments)
@@ -62,3 +61,4 @@ namespace Jira___Azure_migration
 
 
 // query to get formatting data in description : "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;\r\n";
+// query to get many data from comments : "SELECT jiraaction.actionbody, jiraaction.AUTHOR, jiraaction.CREATED FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = 148 and project = 15000 ORDER BY jiraissue.CREATED DESC;";
