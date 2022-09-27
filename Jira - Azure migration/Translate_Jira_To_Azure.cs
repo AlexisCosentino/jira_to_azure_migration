@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+
 namespace Jira___Azure_migration
 {
 
@@ -12,6 +13,8 @@ namespace Jira___Azure_migration
     {
         Dictionary<string, string> ticketData;
         public string comment { get; set; }
+        public string attachment { get; set; }
+
 
 
         public Translate_Jira_To_Azure(Dictionary<string, string> dict)
@@ -40,7 +43,7 @@ namespace Jira___Azure_migration
             {
                 ticketData[item] = cleanJson(ticketData[item]);
             }
-
+    
 
             string jsonToPost = "[{ \"op\": \"add\", \"path\": \"/fields/System.Title\", \"from\": null, \"value\": \"" + ticketData["summary"] + "\"}";
             jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] +"\"} ";
@@ -48,6 +51,8 @@ namespace Jira___Azure_migration
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedBy\", \"value\": \"" + ticketData["creator"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.AssignedTo\", \"value\": \"" + ticketData["assignee"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"value\": \""+ createdDate +"\" }";
+            //jsonToPost += ", {\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \"https://dev.azure.com/IRIUMSOFTWARE/94d3079f-fdfd-48f4-b420-2a41ec9be70d/_apis/wit/attachments/1507a21d-ba08-4cee-88bc-0c36bc380097?fileName=Classe%20UML%20migration%20jira%20to%20azure.png&download=true&api-version=5.0-preview.2\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
+            //jsonToPost += ", {\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \"https://dev.azure.com/IRIUMSOFTWARE/94d3079f-fdfd-48f4-b420-2a41ec9be70d/_apis/wit/attachments/0868b30c-b65d-4c30-8112-c84fac7826d6?fileName=portrait2.png&download=true&api-version=5.0-preview.2\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
             jsonToPost += "]";
 
             Console.WriteLine(jsonToPost);
@@ -62,9 +67,9 @@ namespace Jira___Azure_migration
         }
 
 
-        public string createJsonToPatchPBI()
+        public string createJsonToPatchPBIWithAttachment()
         {
-            string json = "[{\"op\": \"add\", \"path\": \"/fields/System.AssignedTo\", \"value\": \""+ ticketData["assignee"] +"\" }";
+            string json = "[{\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \""+ attachment +"\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
             json += "]";
             return json;
         }

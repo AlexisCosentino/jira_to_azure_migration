@@ -49,6 +49,7 @@ namespace Jira___Azure_migration
                         value_dict.Add("updated", reader[15].ToString());
                         value_dict.Add("dueDate", reader[16].ToString());
                         value_dict.Add("ProjectName", reader[31].ToString());
+                        value_dict.Add("issueID", reader[0].ToString());
                         queryAnswerDict.Add(ID, value_dict);
                     }
                 }
@@ -110,6 +111,47 @@ namespace Jira___Azure_migration
                 conn.Close();
                 Console.WriteLine(JsonConvert.SerializeObject(queryAnswerList).ToString());
 
+            }
+            return queryAnswerList;
+        }
+
+        public List<string> getListOfAttachments()
+        {
+            get_credentials();
+            List<string> queryAnswerList = new List<string>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        var attachment_link = $"https://worklog.vega-systems.com/secure/attachment/{reader[0]}/{reader[2]}";
+                        Console.WriteLine(attachment_link);
+                        queryAnswerList.Add(attachment_link);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
             }
             return queryAnswerList;
         }
