@@ -38,7 +38,7 @@ namespace Jira___Azure_migration
             HttpClient client = new HttpClient();
 
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", "fdpl7bt3lmv577g5ftbcw5bzhxxedbi434se4l5ro53ki7vry4ta"))));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(string.Format("{0}:{1}", "", get_credentials("azureToken")))));
 
             WebClient wc = new WebClient();
 
