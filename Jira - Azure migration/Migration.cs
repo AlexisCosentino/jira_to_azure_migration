@@ -27,9 +27,21 @@ namespace Jira___Azure_migration
 
         public void launchMigration()
         {
+            Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira");
+            string choice = Console.ReadLine();
             connection = new DB_Connection();
-            connection.query = "SELECT TOP 1 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;\r\n";
-            connection.query = "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;\r\n";
+            switch (choice)
+            {
+                case "1":
+                    connection.query = "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;";
+                    break;
+                case "2": default:
+                    connection.query = "SELECT TOP 1 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    break;
+                case "3":
+                    connection.query = "SELECT TOP 10 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    break;
+            }
             var dict_of_pbi = connection.getDictOfPBI();
 
             foreach (var dict in dict_of_pbi.Values)
