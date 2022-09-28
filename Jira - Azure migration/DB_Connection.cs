@@ -74,6 +74,53 @@ namespace Jira___Azure_migration
             return queryAnswerDict;
         }
 
+        public Dictionary<string, Dictionary<string, string>> getDictOfComments()
+        {
+            get_credentials();
+            var queryAnswerDict = new Dictionary<string, Dictionary<string, string>>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        var value_dict = new Dictionary<string, string>();
+                        var ID = reader[4].ToString();
+                        value_dict.Add("issueID", reader[0].ToString());
+                        value_dict.Add("author", reader[1].ToString());
+                        value_dict.Add("comment", reader[2].ToString());
+                        value_dict.Add("created_date", reader[3].ToString());
+                        queryAnswerDict.Add(ID, value_dict);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+                Console.WriteLine(JsonConvert.SerializeObject(queryAnswerDict).ToString());
+
+            }
+            return queryAnswerDict;
+        }
+
         public List<string> getListOfComments()
         {
             get_credentials();
@@ -90,7 +137,7 @@ namespace Jira___Azure_migration
                 {
                     while (reader.Read())
                     {
-                        queryAnswerList.Add(reader[0].ToString());
+                        queryAnswerList.Add(reader[2].ToString());
                     }
                 }
                 catch (Exception ex)

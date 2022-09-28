@@ -14,7 +14,7 @@ namespace Jira___Azure_migration
         public const string BASE = "https://dev.azure.com";
         string PAT;
         public const string ORG = "IRIUMSOFTWARE";
-        public const string API = "api-version=6.0";
+        public const string API = "bypassRules=true&api-version=6.0";
         public const string PROJECT = "TEST_ALEXIS";
         public string ID_of_PBI;
 

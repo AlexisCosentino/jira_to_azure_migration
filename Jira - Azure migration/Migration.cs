@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -29,6 +30,11 @@ namespace Jira___Azure_migration
         {
             Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira");
             string choice = Console.ReadLine();
+
+            //GET EXECUTION TIME !!
+            Stopwatch stwatch = new Stopwatch();
+            stwatch.Start();
+
             connection = new DB_Connection();
             switch (choice)
             {
@@ -55,6 +61,8 @@ namespace Jira___Azure_migration
                 //Get every Attachments related of PBI
                 connection.query = $"SELECT id ,mimetype, filename FROM fileattachment Where issueid = {dict["issueID"]};";
                 var list_of_attachments = connection.getListOfAttachments();
+
+                /*
                 foreach (var attachment in list_of_attachments)
                 {
                     // first we need post jira link to azure server, dont forget use webclient to connect to jira account because data is secured
@@ -69,16 +77,21 @@ namespace Jira___Azure_migration
                     Patch_PBI_To_Azure.patchPBIToAzure(attachment_json_to_post);
                 }
 
+                */
+
                 //Get every comments related of PBI
-                connection.query = $"SELECT jiraaction.actionbody FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
-                var list_of_comments = connection.getListOfComments();
-                foreach (var comment in list_of_comments)
+                connection.query = $"SELECT jiraaction.issueid, jiraaction.author, jiraaction.actionbody, jiraaction.CREATED,  jiraaction.id FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
+
+                
+                var dict_of_comments = connection.getDictOfComments();
+                foreach (var comment in dict_of_comments.Values)
                 {
-                    Translate_Jira_To_Azure.comment = comment;
+                    Translate_Jira_To_Azure.comment_dict = comment;
                     var comment_json_to_post = Translate_Jira_To_Azure.createJsonWithCommentToPost();
                     Post_Comment_To_Azure_PBI = new Post_Comment_To_Azure_PBI(PBI_ID);
                     Post_Comment_To_Azure_PBI.postCommentToAzurePBI(comment_json_to_post);
                 }
+
 
 
                 //THIS IS THE CODE TO UPDATE YOUR PBI IN CASE YOU NEED :)
@@ -89,9 +102,13 @@ namespace Jira___Azure_migration
                */
 
                 // Comment the next line if you want export mass data in once
-                Console.WriteLine("press ENTER to keep going");
-                Console.ReadLine();
+                //Console.WriteLine("press ENTER to keep going");
+                //Console.ReadLine();
             }
+            stwatch.Stop();
+            var exec_time = String.Format("{0:00}:{1:00}.{2:00}", stwatch.Elapsed.Minutes, stwatch.Elapsed.Seconds,
+            stwatch.Elapsed.Milliseconds / 10);
+            Console.WriteLine($"Execution time is {exec_time}");
         }
     }
 }

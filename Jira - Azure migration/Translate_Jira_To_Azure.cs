@@ -14,6 +14,7 @@ namespace Jira___Azure_migration
         Dictionary<string, string> ticketData;
         public string comment { get; set; }
         public string attachment { get; set; }
+        public Dictionary<string, string> comment_dict { get; set; }
 
 
 
@@ -61,11 +62,11 @@ namespace Jira___Azure_migration
 
         public string createJsonWithCommentToPost()
         {
-            comment = cleanJson(comment);
+            comment = cleanJson(comment_dict["comment"]);
+            comment = String.Join("<br><br>", $"<h2><strong>Ecrit par {comment_dict["author"]}</strong></h2> <h4>Le {comment_dict["created_date"]}</h4>", comment);
             string jsonToPost = "{ \"text\": \"" + comment + "\"}";
             return jsonToPost;
         }
-
 
         public string createJsonToPatchPBIWithAttachment()
         {
