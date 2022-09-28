@@ -23,11 +23,6 @@ namespace Jira___Azure_migration
             ticketData = dict;
         }
 
-        public Translate_Jira_To_Azure(string comment)
-        {
-            this.comment = comment;
-        }
-
 
         public string createJsonWithPBIToPost()
         {
