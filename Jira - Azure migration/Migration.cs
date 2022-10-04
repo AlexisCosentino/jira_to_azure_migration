@@ -28,7 +28,7 @@ namespace Jira___Azure_migration
 
         public void launchMigration()
         {
-            Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira");
+            Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira \r\n 4 -> Import all project to Azure area path");
             string choice = Console.ReadLine();
 
             //GET EXECUTION TIME !!
@@ -39,14 +39,17 @@ namespace Jira___Azure_migration
             switch (choice)
             {
                 case "1":
-                    connection.query = "SELECT * FROM jiraissue, project WHERE project.id = jiraissue.project and issuenum= 148 and project = 15000 and project.pname not like '%Hotline%' ORDER BY jiraissue.CREATED DESC;";
+                    connection.query = "SELECT * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and andissuenum= 148 and project = 15000 and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
                     break;
                 case "2": default:
-                    connection.query = "SELECT TOP 1 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = "SELECT TOP 1 * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
                     break;
                 case "3":
-                    connection.query = "SELECT TOP 10 * FROM jiraissue, project WHERE project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = "SELECT TOP 10 * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
                     break;
+                case "4":
+                    connection.query = "SELECT distinct project.pname FROM jiraissue, project, issuetype, issuestatus WHERE issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301);";
+                    return;
             }
             var dict_of_pbi = connection.getDictOfPBI();
 
@@ -97,7 +100,6 @@ namespace Jira___Azure_migration
                     }
                 }
             }
-            Console.WriteLine("Done.");
             stwatch.Stop();
             var exec_time = String.Format("{0:00}:{1:00}.{2:00}", stwatch.Elapsed.Minutes, stwatch.Elapsed.Seconds,
             stwatch.Elapsed.Milliseconds / 10);

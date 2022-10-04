@@ -42,13 +42,15 @@ namespace Jira___Azure_migration
                         value_dict.Add("project", reader[3].ToString());
                         value_dict.Add("assignee", reader[5].ToString());
                         value_dict.Add("creator", reader[6].ToString());
-                        value_dict.Add("issueType", reader[7].ToString());
+                        value_dict.Add("issueTypeID", reader[7].ToString());
                         value_dict.Add("summary", reader[8].ToString());
                         value_dict.Add("description", reader[9].ToString());
                         value_dict.Add("created", reader[14].ToString());
                         value_dict.Add("updated", reader[15].ToString());
                         value_dict.Add("dueDate", reader[16].ToString());
                         value_dict.Add("ProjectName", reader[31].ToString());
+                        value_dict.Add("issueType", reader[43].ToString());
+                        value_dict.Add("priority", reader[56].ToString());
                         value_dict.Add("issueID", reader[0].ToString());
                         queryAnswerDict.Add(ID, value_dict);
                     }

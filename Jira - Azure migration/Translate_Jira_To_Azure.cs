@@ -47,10 +47,12 @@ namespace Jira___Azure_migration
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedBy\", \"value\": \"" + ticketData["creator"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.AssignedTo\", \"value\": \"" + ticketData["assignee"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"value\": \""+ createdDate +"\" }";
-            //jsonToPost += ", {\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \"https://dev.azure.com/IRIUMSOFTWARE/94d3079f-fdfd-48f4-b420-2a41ec9be70d/_apis/wit/attachments/1507a21d-ba08-4cee-88bc-0c36bc380097?fileName=Classe%20UML%20migration%20jira%20to%20azure.png&download=true&api-version=5.0-preview.2\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
-            //jsonToPost += ", {\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \"https://dev.azure.com/IRIUMSOFTWARE/94d3079f-fdfd-48f4-b420-2a41ec9be70d/_apis/wit/attachments/0868b30c-b65d-4c30-8112-c84fac7826d6?fileName=portrait2.png&download=true&api-version=5.0-preview.2\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.TeamProject\", \"value\": \"TEST_ALEXIS\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.AreaPath\", \"value\": \"TEST_ALEXIS\\\\Dev Team\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.Tags\", \"value\": \""+ ticketData["ProjectName"] +"\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.Type\", \"value\": \"" + ticketData["issueType"] + "\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.PriorityField\", \"value\": \"" + ticketData["priority"] + "\" }";
             jsonToPost += "]";
-
             Console.WriteLine(jsonToPost);
             return jsonToPost;
         }
@@ -88,7 +90,3 @@ namespace Jira___Azure_migration
         }
     }
 }
-
-
-
-
