@@ -30,7 +30,7 @@ namespace Jira___Azure_migration
             var parsedDate = DateTime.Parse(created);
             if (parsedDate.Date == DateTime.Today)
             {
-                // WARNING = if date of creation is less than 2hours, an error gonna occur, thats why i substract 2h in case of ticket from today.
+                // WARNING = if date of creation is less than 2hours, an error gonna occurS, thats why i substract 2h in case of ticket from today.
                 parsedDate = parsedDate.AddHours(-2);
             }
             var createdDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc).ToString("s") + ".000Z";
@@ -39,11 +39,13 @@ namespace Jira___Azure_migration
             {
                 ticketData[item] = cleanJson(ticketData[item]);
             }
+
+            var issueStatus = translateStatusToAzure(ticketData["issueStatus"]);
     
 
             string jsonToPost = "[{ \"op\": \"add\", \"path\": \"/fields/System.Title\", \"from\": null, \"value\": \"" + ticketData["summary"] + "\"}";
             jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] +"\"} ";
-            jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.State\", \"from\": null, \"value\": \"Development in Progress\"}";
+            jsonToPost += ", { \"op\": \"add\", \"path\": \"/fields/System.State\", \"from\": null, \"value\": \""+ issueStatus +"\"}";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedBy\", \"value\": \"" + ticketData["creator"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.AssignedTo\", \"value\": \"" + ticketData["assignee"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"value\": \""+ createdDate +"\" }";
@@ -87,6 +89,52 @@ namespace Jira___Azure_migration
 
             // h2. = H2 Title
             return toformat;
+        }
+
+        public string translateStatusToAzure(string status)
+        {
+            switch(status)
+            {
+                case "Acceptée":
+                    status = "Approved";
+                    return status;
+                case "A Compléter":
+                    status = "To Complete";
+                    return status;
+                case "Attente test":
+                    status = "Test";
+                    return status;
+                case "Cloturée":
+                    status = "Done";
+                    return status;
+                case "Demande":
+                    status = "New";
+                    return status;
+                case "EN ATTENTE":
+                    status = "Pending";
+                    return status;
+                case "En cours":
+                    status = "Developement in Progress";
+                    return status;
+                case "Rejetée":
+                    status = "Denied";
+                    return status;
+                case "Terminée":
+                    status = "Commited";
+                    return status;
+                case "Test KO":
+                    status = "Test Ko";
+                    return status;
+                case "A tester":
+                    status = "Test";
+                    return status;
+                case "A Valider":
+                    status = "New";
+                    return status;
+                default:
+                    status = "New";
+                    return status;
+            }
         }
     }
 }
