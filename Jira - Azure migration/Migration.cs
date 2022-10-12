@@ -39,7 +39,7 @@ namespace Jira___Azure_migration
             switch (choice)
             {
                 case "1":
-                    connection.query = "SELECT * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and andissuenum= 148 and project = 15000 and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = "SELECT * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuenum= 148 and project = 15000 and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
                     break;
                 case "2": default:
                     connection.query = "SELECT TOP 1 * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
@@ -61,6 +61,19 @@ namespace Jira___Azure_migration
                 {
                     progress.Report((double)i / total);
                     i++;
+
+                    
+                    connection.query = "select component.cname from component, jiraissue inner join nodeassociation on nodeassociation.ASSOCIATION_TYPE = 'IssueComponent' where nodeassociation.sink_node_id = component.id and jiraissue.id = nodeassociation.SOURCE_NODE_ID and jiraissue.id = " + dict["issueNb"] + ";";
+                    List<string> components = connection.getListOfComponents();
+
+                    connection.query = "select projectversion.vname from projectversion, jiraissue inner join nodeassociation on nodeassociation.ASSOCIATION_TYPE = 'IssueFixVersion' where nodeassociation.sink_node_id = projectversion.id and jiraissue.id = nodeassociation.SOURCE_NODE_ID and jiraissue.id = "+ dict["issueNb"] +";";
+                    List<string> fixedVersion = connection.getListOfFixedVersion();
+
+                    connection.query = "select label.label from label where label.issue = " + dict["issueNb"] + ";";
+                    List<string> labels = connection.getListOfLabels();
+
+
+
                     Translate_Jira_To_Azure = new Translate_Jira_To_Azure(dict);
                     var json = Translate_Jira_To_Azure.createJsonWithPBIToPost();
                     Post_PBI_To_Azure = new Post_PBI_To_Azure();
@@ -85,8 +98,9 @@ namespace Jira___Azure_migration
                         var Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID);
                         Patch_PBI_To_Azure.patchPBIToAzure(attachment_json_to_post);
                     }
-
                     */
+                    
+
 
                     //Get every comments related of PBI
                     connection.query = $"SELECT jiraaction.issueid, jiraaction.author, jiraaction.actionbody, jiraaction.CREATED,  jiraaction.id FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";

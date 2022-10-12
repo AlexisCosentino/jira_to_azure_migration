@@ -60,6 +60,7 @@ namespace Jira___Azure_migration
 
         public async Task<string> CreateWIT(HttpClient client, string uri, HttpContent content)
         {
+            Console.WriteLine(uri);
             try
             {
                 // Send asynchronous POST request.

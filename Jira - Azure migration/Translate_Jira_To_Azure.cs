@@ -51,7 +51,7 @@ namespace Jira___Azure_migration
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.CreatedDate\", \"value\": \""+ createdDate +"\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.TeamProject\", \"value\": \"TEST_ALEXIS\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.AreaPath\", \"value\": \"TEST_ALEXIS\\\\Dev Team\" }";
-            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.Tags\", \"value\": \""+ ticketData["ProjectName"] +"\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.Tags\", \"value\": \""+ ticketData["ProjectName"] +"; tag2\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.Type\", \"value\": \"" + ticketData["issueType"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.PriorityField\", \"value\": \"" + ticketData["priority"] + "\" }";
             jsonToPost += "]";
@@ -86,8 +86,6 @@ namespace Jira___Azure_migration
             toformat = toformat.Replace("\\", "");  // Remove every backslash of the text
             toformat = toformat.Replace("*[", "<strong>[");
             toformat = toformat.Replace("]*", "]</strong>");
-
-            // h2. = H2 Title
             return toformat;
         }
 

@@ -206,6 +206,129 @@ namespace Jira___Azure_migration
             return queryAnswerList;
         }
 
+        public List<string> getListOfComponents()
+        {
+            get_credentials();
+            List<string> queryAnswerList = new List<string>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        queryAnswerList.Add(reader[1].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+                Console.WriteLine(JsonConvert.SerializeObject(queryAnswerList).ToString());
+
+            }
+            return queryAnswerList;
+        }
+
+        public List<string> getListOfFixedVersion()
+        {
+            get_credentials();
+            List<string> queryAnswerList = new List<string>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        queryAnswerList.Add(reader[1].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+                Console.WriteLine(JsonConvert.SerializeObject(queryAnswerList).ToString());
+
+            }
+            return queryAnswerList;
+        }
+
+        public List<string> getListOfLabels()
+        {
+            get_credentials();
+            List<string> queryAnswerList = new List<string>();
+            SqlConnection conn = new SqlConnection($"Server={hostname};Database={dbname};User Id={username};Password={password};");
+            try
+            {
+                SqlCommand command = new SqlCommand(this.query, conn);
+
+                conn.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                try
+                {
+                    while (reader.Read())
+                    {
+                        queryAnswerList.Add(reader[1].ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                conn.Close();
+                Console.WriteLine(JsonConvert.SerializeObject(queryAnswerList).ToString());
+
+            }
+            return queryAnswerList;
+        }
+
         private void get_credentials()
         {
             JObject data = JObject.Parse(File.ReadAllText("data.json"));
