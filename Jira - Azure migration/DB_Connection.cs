@@ -38,7 +38,7 @@ namespace Jira___Azure_migration
                     {
                         var value_dict = new Dictionary<string, string>();
                         var ID = reader[0].ToString();
-                        value_dict.Add("issueNb", reader[2].ToString());
+                        value_dict.Add("issueNb", reader[0].ToString());
                         value_dict.Add("project", reader[3].ToString());
                         value_dict.Add("assignee", reader[5].ToString());
                         value_dict.Add("creator", reader[6].ToString());
@@ -52,7 +52,6 @@ namespace Jira___Azure_migration
                         value_dict.Add("issueType", reader[43].ToString());
                         value_dict.Add("priority", reader[56].ToString());
                         value_dict.Add("issueStatus", reader[50].ToString());
-                        value_dict.Add("issueID", reader[0].ToString());
                         queryAnswerDict.Add(ID, value_dict);
                     }
                 }
@@ -222,7 +221,7 @@ namespace Jira___Azure_migration
                 {
                     while (reader.Read())
                     {
-                        queryAnswerList.Add(reader[1].ToString());
+                        queryAnswerList.Add(reader[0].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -263,7 +262,7 @@ namespace Jira___Azure_migration
                 {
                     while (reader.Read())
                     {
-                        queryAnswerList.Add(reader[1].ToString());
+                        queryAnswerList.Add(reader[0].ToString());
                     }
                 }
                 catch (Exception ex)
@@ -304,7 +303,7 @@ namespace Jira___Azure_migration
                 {
                     while (reader.Read())
                     {
-                        queryAnswerList.Add(reader[1].ToString());
+                        queryAnswerList.Add(reader[0].ToString());
                     }
                 }
                 catch (Exception ex)

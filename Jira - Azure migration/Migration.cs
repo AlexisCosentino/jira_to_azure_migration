@@ -10,7 +10,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Jira___Azure_migration;
+using Newtonsoft.Json.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json;
 
 namespace Jira___Azure_migration
 {
@@ -28,7 +30,7 @@ namespace Jira___Azure_migration
 
         public void launchMigration()
         {
-            Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira \r\n 4 -> Import all project to Azure area path");
+            Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira \r\n ");
             string choice = Console.ReadLine();
 
             //GET EXECUTION TIME !!
@@ -39,17 +41,14 @@ namespace Jira___Azure_migration
             switch (choice)
             {
                 case "1":
-                    connection.query = "SELECT * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuenum= 148 and project = 15000 and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = get_query("issue_199770");
                     break;
                 case "2": default:
-                    connection.query = "SELECT TOP 1 * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = get_query("last_issue");
                     break;
                 case "3":
-                    connection.query = "SELECT TOP 10 * FROM jiraissue, project, issuetype, issuestatus, priority WHERE jiraissue.priority=priority.ID and issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301) ORDER BY CREATED DESC;";
+                    connection.query = get_query("last_10_issues");
                     break;
-                case "4":
-                    connection.query = "SELECT distinct project.pname FROM jiraissue, project, issuetype, issuestatus WHERE issuestatus.ID=jiraissue.issuestatus and issuetype.id=jiraissue.issuetype and project.id=jiraissue.project and issuetype != 10800 and not (project.id = 10000 or project.id= 13301);";
-                    return;
             }
             var dict_of_pbi = connection.getDictOfPBI();
 
@@ -72,6 +71,23 @@ namespace Jira___Azure_migration
                     connection.query = "select label.label from label where label.issue = " + dict["issueNb"] + ";";
                     List<string> labels = connection.getListOfLabels();
 
+                    string labelsString = dict["ProjectName"] + "; ";
+
+                    foreach (var label in labels)
+                    {
+                        labelsString += label + "; ";
+                    }
+                    foreach (var fv in fixedVersion)
+                    {
+                        labelsString += "fixedV : " + fv + "; ";
+                    }
+                    foreach(var c in components)
+                    {
+                        labelsString += "component :" + c + "; ";
+                    }
+
+                    Console.WriteLine(labelsString);
+                    dict["ListOfLabels"] = labelsString;
 
 
                     Translate_Jira_To_Azure = new Translate_Jira_To_Azure(dict);
@@ -81,7 +97,7 @@ namespace Jira___Azure_migration
                     string PBI_ID = Post_PBI_To_Azure.ID_of_PBI;
 
                     //Get every Attachments related of PBI
-                    connection.query = $"SELECT id ,mimetype, filename FROM fileattachment Where issueid = {dict["issueID"]};";
+                    connection.query = $"SELECT id ,mimetype, filename FROM fileattachment Where issueid = {dict["issueNb"]};";
                     var list_of_attachments = connection.getListOfAttachments();
 
                     /*
@@ -103,7 +119,7 @@ namespace Jira___Azure_migration
 
 
                     //Get every comments related of PBI
-                    connection.query = $"SELECT jiraaction.issueid, jiraaction.author, jiraaction.actionbody, jiraaction.CREATED,  jiraaction.id FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issuenum = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
+                    connection.query = $"SELECT jiraaction.issueid, jiraaction.author, jiraaction.actionbody, jiraaction.CREATED,  jiraaction.id FROM jiraissue, project, jiraaction WHERE jiraaction.issueid = jiraissue.id  and project.id = jiraissue.project and issueid = {dict["issueNb"]} and project = {dict["project"]} ORDER BY jiraissue.CREATED DESC;";
                     var dict_of_comments = connection.getDictOfComments();
                     foreach (var comment in dict_of_comments.Values)
                     {
@@ -118,6 +134,12 @@ namespace Jira___Azure_migration
             var exec_time = String.Format("{0:00}:{1:00}.{2:00}", stwatch.Elapsed.Minutes, stwatch.Elapsed.Seconds,
             stwatch.Elapsed.Milliseconds / 10);
             Console.WriteLine($"Execution time is {exec_time}");
+        }
+
+        private string get_query(string query_name)
+        {
+            JObject data = JObject.Parse(File.ReadAllText("queries.json"));
+            return (string?)data[query_name];
         }
     }
 }
