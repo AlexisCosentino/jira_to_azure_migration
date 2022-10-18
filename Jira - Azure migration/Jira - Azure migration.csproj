@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="queries.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
     <None Update="data.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

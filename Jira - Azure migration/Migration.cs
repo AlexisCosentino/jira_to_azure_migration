@@ -99,8 +99,7 @@ namespace Jira___Azure_migration
                     //Get every Attachments related of PBI
                     connection.query = $"SELECT id ,mimetype, filename FROM fileattachment Where issueid = {dict["issueNb"]};";
                     var list_of_attachments = connection.getListOfAttachments();
-
-                    /*
+                    
                     foreach (var attachment in list_of_attachments)
                     {
                         // first we need post jira link to azure server, dont forget use webclient to connect to jira account because data is secured
@@ -111,11 +110,17 @@ namespace Jira___Azure_migration
                         var azure_link = Post_Attachment_To_Azure.PatchAttachmentToAzureServer(attachment, filename);
                         Translate_Jira_To_Azure.attachment = azure_link;
                         var attachment_json_to_post = Translate_Jira_To_Azure.createJsonToPatchPBIWithAttachment();
-                        var Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID);
+                        Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID);
                         Patch_PBI_To_Azure.patchPBIToAzure(attachment_json_to_post);
                     }
-                    */
-                    
+                    Console.WriteLine("IM OUT OF ATTACHMENT FOR LOOP");
+                    var descriptionJson = Translate_Jira_To_Azure.getDescriptionJson();
+                    if (descriptionJson != "false")
+                    {
+                        Patch_PBI_To_Azure.patchPBIToAzure(descriptionJson);
+                    }
+
+
 
 
                     //Get every comments related of PBI
@@ -140,6 +145,7 @@ namespace Jira___Azure_migration
         {
             JObject data = JObject.Parse(File.ReadAllText("queries.json"));
             return (string?)data[query_name];
+
         }
     }
 }

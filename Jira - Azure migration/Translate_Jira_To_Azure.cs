@@ -14,6 +14,7 @@ namespace Jira___Azure_migration
         Dictionary<string, string> ticketData;
         public string comment { get; set; }
         public string attachment { get; set; }
+        public List<string> attachment_url { get; set; }= new List<string>();
         public Dictionary<string, string> comment_dict { get; set; }
 
 
@@ -62,6 +63,10 @@ namespace Jira___Azure_migration
         public string createJsonWithCommentToPost()
         {
             comment = cleanJson(comment_dict["comment"]);
+            foreach (var a in this.attachment_url)
+            {
+                comment = find_img_and_change(comment, a.Split("fileName=").Last(), a);
+            }
             comment = String.Join("<br><br>", $"<h2><strong>Ecrit par {comment_dict["author"]}</strong></h2> <h4>Le {comment_dict["created_date"]}</h4>", comment);
             string jsonToPost = "{ \"text\": \"" + comment + "\"}";
             return jsonToPost;
@@ -71,11 +76,33 @@ namespace Jira___Azure_migration
         {
             string json = "[{\"op\": \"add\", \"path\": \"/relations/-\", \"value\": { \"rel\": \"AttachedFile\", \"url\": \""+ attachment +"\", \"attributes\": {\"comment\": \"Spec for the work\"}}}";
             json += "]";
+            this.attachment_url.Add(attachment);
             return json;
+        }
+        public string getDescriptionJson()
+        {
+            if (attachment_url.Count > 0)
+            {
+                foreach (var a in this.attachment_url)
+                {
+                    ticketData["description"] = find_img_and_change(ticketData["description"], a.Split("fileName=").Last(), a);
+                }
+                string json = "[{ \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] + "\"}]";
+
+                return json;
+            }
+            else
+            {
+              return "false";
+            }
         }
 
         public string cleanJson(string toformat)
         {
+            toformat = toformat.Replace("{code:java}", "<code>");
+            toformat = toformat.Replace("{code:java}", "<code>");
+            
+            toformat = toformat.Replace("{code}", "</code>");
             toformat = toformat.Replace("\r\n *****", "<br>&emsp;&emsp;&emsp;&emsp;&emsp;\t■");
             toformat = toformat.Replace("\r\n ****", "<br>&emsp;&emsp;&emsp;&emsp;\t■");
             toformat = toformat.Replace("\r\n ***", "<br>&emsp;&emsp;&emsp;\t■");
@@ -133,6 +160,12 @@ namespace Jira___Azure_migration
                     status = "New";
                     return status;
             }
+        }
+
+        public string find_img_and_change(string desc, string toFind, string url)
+        {
+            desc = desc.Replace(toFind, $"<img alt='img_url' src='{url}' >");
+            return desc;
         }
     }
 }
