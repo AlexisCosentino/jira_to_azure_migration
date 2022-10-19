@@ -81,6 +81,7 @@ namespace Jira___Azure_migration
             this.attachment_url.Add(attachment);
             return json;
         }
+
         public string getDescriptionJson()
         {
             if (attachment_url.Count > 0)

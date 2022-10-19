@@ -36,25 +36,6 @@ namespace Jira___Azure_migration
                 {
                     while (reader.Read())
                     {
-/*                        var value_dict = new Dictionary<string, string>();
-                        var ID = reader[0].ToString();
-                        value_dict.Add("issueNb", reader[0].ToString());
-                        value_dict.Add("project", reader[3].ToString());
-                        value_dict.Add("assignee", reader[5].ToString());
-                        value_dict.Add("creator", reader[6].ToString());
-                        value_dict.Add("issueTypeID", reader[7].ToString());
-                        value_dict.Add("summary", reader[8].ToString());
-                        value_dict.Add("description", reader[9].ToString());
-                        value_dict.Add("created", reader[14].ToString());
-                        value_dict.Add("updated", reader[15].ToString());
-                        value_dict.Add("dueDate", reader[16].ToString());
-                        value_dict.Add("ProjectName", reader[31].ToString());
-                        value_dict.Add("issueType", reader[43].ToString());
-                        value_dict.Add("priority", reader[56].ToString());
-                        value_dict.Add("issueStatus", reader[50].ToString());
-                        queryAnswerDict.Add(ID, value_dict);*/
-
-
                         var value_dict = new Dictionary<string, string>();
                         var ID = reader[0].ToString();
                         value_dict.Add("issueNb", reader[0].ToString());
@@ -74,6 +55,7 @@ namespace Jira___Azure_migration
                         value_dict.Add("componentList", reader[15].ToString());
                         value_dict.Add("fixedVersionList", reader[16].ToString());
                         value_dict.Add("labelsList", reader[17].ToString());
+                        value_dict.Add("sprintList", reader[18].ToString());
                         queryAnswerDict.Add(ID, value_dict);
 
                     }

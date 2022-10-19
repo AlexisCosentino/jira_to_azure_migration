@@ -61,7 +61,7 @@ namespace Jira___Azure_migration
                     progress.Report((double)i / total);
                     i++;
 
-                    dict["ListOfLabels"] = getLabelsComponentAndFixedVersion(dict);
+                    dict["ListOfLabels"] = getLabelsAndComponentAndFixedVersionAndSprint(dict);
 
 
                     Translate_Jira_To_Azure = new Translate_Jira_To_Azure(dict);
@@ -122,9 +122,9 @@ namespace Jira___Azure_migration
 
         }
 
-        private string getLabelsComponentAndFixedVersion(Dictionary<string, string> dict)
+        private string getLabelsAndComponentAndFixedVersionAndSprint(Dictionary<string, string> dict)
         {
-            string labelsString = $"poject: {dict["ProjectName"]};";
+            string labelsString = $"projet : {dict["ProjectName"]};";
             foreach(string label in dict["labelsList"].Split(','))
             {
                 if (!string.IsNullOrEmpty(label))
@@ -144,6 +144,13 @@ namespace Jira___Azure_migration
                 if (!string.IsNullOrEmpty(fv))
                 {
                     labelsString += $"fixedVersion : {fv};";
+                }
+            }
+            foreach (string sp in dict["sprintList"].Split(','))
+            {
+                if (!string.IsNullOrEmpty(sp))
+                {
+                    labelsString += $"sprint : {sp};";
                 }
             }
             Console.WriteLine(labelsString);
