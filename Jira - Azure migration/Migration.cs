@@ -61,8 +61,7 @@ namespace Jira___Azure_migration
                     progress.Report((double)i / total);
                     i++;
 
-                    dict["ListOfLabels"] = getLabelsComponentAndFixedVersion(dict["issueNb"], dict["ProjectName"], connection);
-                    dict["ListOfLabels"] = getLabelsComponentAndFixedVersion2(dict);
+                    dict["ListOfLabels"] = getLabelsComponentAndFixedVersion(dict);
 
 
                     Translate_Jira_To_Azure = new Translate_Jira_To_Azure(dict);
@@ -123,37 +122,7 @@ namespace Jira___Azure_migration
 
         }
 
-        private string getLabelsComponentAndFixedVersion(string issueNb, string projectName, DB_Connection con)
-        {
-            con.query = $"select component.cname from component, jiraissue inner join nodeassociation on nodeassociation.ASSOCIATION_TYPE = 'IssueComponent' where nodeassociation.sink_node_id = component.id and jiraissue.id = nodeassociation.SOURCE_NODE_ID and jiraissue.id = {issueNb};";
-            List<string> components = con.getListOfComponents();
-
-            con.query = $"select projectversion.vname from projectversion, jiraissue inner join nodeassociation on nodeassociation.ASSOCIATION_TYPE = 'IssueFixVersion' where nodeassociation.sink_node_id = projectversion.id and jiraissue.id = nodeassociation.SOURCE_NODE_ID and jiraissue.id = {issueNb};";
-            List<string> fixedVersion = con.getListOfFixedVersion();
-
-            con.query = $"select label.label from label where label.issue = {issueNb};";
-            List<string> labels = con.getListOfLabels();
-
-            string labelsString = $"{projectName}; ";
-
-            foreach (var label in labels)
-            {
-                labelsString += label + "; ";
-            }
-            foreach (var fv in fixedVersion)
-            {
-                labelsString += "fixedV : " + fv + "; ";
-            }
-            foreach (var c in components)
-            {
-                labelsString += "component :" + c + "; ";
-            }
-
-            Console.WriteLine(labelsString);
-            return labelsString;
-        }
-
-        private string getLabelsComponentAndFixedVersion2(Dictionary<string, string> dict)
+        private string getLabelsComponentAndFixedVersion(Dictionary<string, string> dict)
         {
             string labelsString = $"poject: {dict["ProjectName"]};";
             foreach(string label in dict["labelsList"].Split(','))

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -65,7 +67,7 @@ namespace Jira___Azure_migration
             comment = cleanJson(comment_dict["comment"]);
             foreach (var a in this.attachment_url)
             {
-                comment = find_img_and_change(comment, a.Split("fileName=").Last(), a);
+                comment = editHTMLTagsDependsAttachment(a, comment);
             }
             comment = String.Join("<br><br>", $"<h2><strong>Ecrit par {comment_dict["author"]}</strong></h2> <h4>Le {comment_dict["created_date"]}</h4>", comment);
             string jsonToPost = "{ \"text\": \"" + comment + "\"}";
@@ -85,7 +87,8 @@ namespace Jira___Azure_migration
             {
                 foreach (var a in this.attachment_url)
                 {
-                    ticketData["description"] = find_img_and_change(ticketData["description"], a.Split("fileName=").Last(), a);
+                    ticketData["description"] = editHTMLTagsDependsAttachment(a, ticketData["description"]);
+
                 }
                 string json = "[{ \"op\": \"add\", \"path\": \"/fields/System.Description\", \"from\": null, \"value\": \"" + ticketData["description"] + "\"}]";
 
@@ -162,10 +165,19 @@ namespace Jira___Azure_migration
             }
         }
 
-        public string find_img_and_change(string desc, string toFind, string url)
+        public string editHTMLTagsDependsAttachment(string a, string desc)
         {
-            desc = desc.Replace(toFind, $"<img alt='img_url' src='{url}' >");
-            return desc;
+            string formated;
+            string file = a.Split("fileName=").Last();
+            if (file.Split('.').Last() == "png" || file.Split('.').Last() == "jpeg" || file.Split('.').Last() == "jpg" || file.Split('.').Last() == "gif")
+            {
+                formated = desc.Replace(file, $"<img alt='img_url' src='{a}' >"); ;
+            }
+            else
+            {
+                formated = desc.Replace(file, $"<a href='{a}' target='_blank'>{file}</a>");
+            }
+            return formated;
         }
     }
 }
