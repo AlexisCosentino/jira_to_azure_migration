@@ -139,7 +139,7 @@ namespace Jira___Azure_migration
             {
                 if (!string.IsNullOrEmpty(c))
                 {
-                    labelsString += $"component : {c};";
+                    labelsString += $"<span style='background-color:red'>component : {c}<span>;";
                 }
             }
             foreach (string fv in dict["fixedVersionList"].Split(','))
