@@ -13,16 +13,18 @@ namespace Jira___Azure_migration
     {
         public const string BASE = "https://dev.azure.com";
         string PAT;
-        public const string ORG = "IRIUMSOFTWARE";
+        public string ORG;
         public const string API = "bypassRules=true&api-version=6.0";
-        public const string PROJECT = "TEST_ALEXIS";
+        public string PROJECT;
         public List<string> WIT_TYPE = new List<string> { "$Task", "$Product Backlog Item" };
         public string ID_of_PBI { get; set; }
 
-        public Post_PBI_To_Azure()
+        public Post_PBI_To_Azure(string org, string project)
         {
             JObject data = JObject.Parse(File.ReadAllText("data.json"));
             this.PAT = (string?)data["azureToken"];
+            this.ORG = org;
+            this.PROJECT = project;
         }
 
         public void PostPBIToAzure(string jsonToPost)

@@ -16,16 +16,18 @@ namespace Jira___Azure_migration
         public const string BASE = "https://dev.azure.com";
         string PAT;
         string ID;
-        public const string ORG = "IRIUMSOFTWARE";
+        public string ORG;
         public const string API = "api-version=6.0";
-        public const string PROJECT = "TEST_ALEXIS";
+        public string PROJECT;
 
 
-        public Post_Attachment_To_Azure(string ID)
+        public Post_Attachment_To_Azure(string ID, string org, string project)
         {
             JObject data = JObject.Parse(File.ReadAllText("data.json"));
             this.PAT = (string?)data["azureToken"];
             this.ID = ID;
+            this.ORG = org;
+            this.PROJECT = project;
         }
 
 

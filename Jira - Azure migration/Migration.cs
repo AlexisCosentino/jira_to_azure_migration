@@ -24,6 +24,9 @@ namespace Jira___Azure_migration
         Translate_Jira_To_Azure Translate_Jira_To_Azure;
         Post_Attachment_To_Azure Post_Attachment_To_Azure;
         Patch_PBI_To_Azure Patch_PBI_To_Azure;
+        string organisation_azure = "IRIUMSOFTWARE";
+        string project_azure = "TEST_ALEXIS";
+
         public Migration()
         {
         }
@@ -66,7 +69,7 @@ namespace Jira___Azure_migration
 
                     Translate_Jira_To_Azure = new Translate_Jira_To_Azure(dict);
                     var json = Translate_Jira_To_Azure.createJsonWithPBIToPost();
-                    Post_PBI_To_Azure = new Post_PBI_To_Azure();
+                    Post_PBI_To_Azure = new Post_PBI_To_Azure(this.organisation_azure, this.project_azure);
                     Post_PBI_To_Azure.PostPBIToAzure(json);
                     string PBI_ID = Post_PBI_To_Azure.ID_of_PBI;
 
@@ -79,12 +82,12 @@ namespace Jira___Azure_migration
                         // first we need post jira link to azure server, dont forget use webclient to connect to jira account because data is secured
                         // return azure link and use it to make json
                         // then use this json to patch on azure PBI
-                        Post_Attachment_To_Azure = new Post_Attachment_To_Azure(PBI_ID);
+                        Post_Attachment_To_Azure = new Post_Attachment_To_Azure(PBI_ID, this.organisation_azure, this.project_azure);
                         var filename = attachment.Split('/').Last();
                         var azure_link = Post_Attachment_To_Azure.PatchAttachmentToAzureServer(attachment, filename);
                         Translate_Jira_To_Azure.attachment = azure_link;
                         var attachment_json_to_post = Translate_Jira_To_Azure.createJsonToPatchPBIWithAttachment();
-                        Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID);
+                        Patch_PBI_To_Azure = new Patch_PBI_To_Azure(PBI_ID, this.organisation_azure, this.project_azure);
                         Patch_PBI_To_Azure.patchPBIToAzure(attachment_json_to_post);
                     }
                     Console.WriteLine("IM OUT OF ATTACHMENT FOR LOOP");
@@ -104,7 +107,7 @@ namespace Jira___Azure_migration
                     {
                         Translate_Jira_To_Azure.comment_dict = comment;
                         var comment_json_to_post = Translate_Jira_To_Azure.createJsonWithCommentToPost();
-                        Post_Comment_To_Azure_PBI = new Post_Comment_To_Azure_PBI(PBI_ID);
+                        Post_Comment_To_Azure_PBI = new Post_Comment_To_Azure_PBI(PBI_ID, this.organisation_azure, this.project_azure);
                         Post_Comment_To_Azure_PBI.postCommentToAzurePBI(comment_json_to_post);
                     }
                 }
