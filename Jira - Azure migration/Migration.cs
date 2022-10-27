@@ -33,6 +33,7 @@ namespace Jira___Azure_migration
 
         public void launchMigration()
         {
+            System.Drawing.Color color = System.Drawing.SystemColors.Window;
             Console.WriteLine("Press :\r\n 1 -> Select issue n°199770 ( comments, attachment, pretty description ) \r\n 2 -> Last issue from jira \r\n 3 -> 10 last issues from jira \r\n ");
             string choice = Console.ReadLine();
 
@@ -139,7 +140,7 @@ namespace Jira___Azure_migration
             {
                 if (!string.IsNullOrEmpty(c))
                 {
-                    labelsString += $"<span style='background-color:red'>component : {c}<span>;";
+                    labelsString += $"component : {c};";
                 }
             }
             foreach (string fv in dict["fixedVersionList"].Split(','))

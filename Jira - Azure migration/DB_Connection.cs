@@ -56,6 +56,10 @@ namespace Jira___Azure_migration
                         value_dict.Add("fixedVersionList", reader[16].ToString());
                         value_dict.Add("labelsList", reader[17].ToString());
                         value_dict.Add("sprintList", reader[18].ToString());
+                        value_dict.Add("startDate", reader[19].ToString());
+                        value_dict.Add("endDate", reader[20].ToString());
+                        value_dict.Add("workLog", reader[21].ToString());
+                        value_dict.Add("totalWorkTime", reader[22].ToString());
                         queryAnswerDict.Add(ID, value_dict);
 
                     }

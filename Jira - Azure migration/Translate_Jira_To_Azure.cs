@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Text;
@@ -29,14 +30,18 @@ namespace Jira___Azure_migration
 
         public string createJsonWithPBIToPost()
         {
-            string created = ticketData["created"];
-            var parsedDate = DateTime.Parse(created);
+            var parsedDate = DateTime.Parse(ticketData["created"]);
             if (parsedDate.Date == DateTime.Today)
             {
                 // WARNING = if date of creation is less than 2hours, an error gonna occurS, thats why i substract 2h in case of ticket from today.
                 parsedDate = parsedDate.AddHours(-2);
             }
             var createdDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc).ToString("s") + ".000Z";
+
+            string dueDate = translateDateTimeToAzure(ticketData["dueDate"]);
+            string startDate = translateDateTimeToAzure(ticketData["startDate"]);
+            string endDate = translateDateTimeToAzure(ticketData["endDate"]);
+            string worklog = getWorkLog(ticketData["workLog"], ticketData["totalWorkTime"]);
 
             foreach (var item in ticketData.Keys)
             {
@@ -57,6 +62,11 @@ namespace Jira___Azure_migration
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/System.Tags\", \"value\": \""+ ticketData["ListOfLabels"] +" \" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.Type\", \"value\": \"" + ticketData["issueType"] + "\" }";
             jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.PriorityField\", \"value\": \"" + ticketData["priority"] + "\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Microsoft.VSTS.Scheduling.DueDate\", \"value\": \"" + dueDate + "\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Microsoft.VSTS.Scheduling.StartDate\", \"value\": \"" + startDate + "\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.Enddate\", \"value\": \"" + endDate + "\" }";
+            jsonToPost += ", {\"op\": \"add\", \"path\": \"/fields/Custom.WorkLog\", \"value\": \"" + worklog + "\" }";
+
             jsonToPost += "]";
             Console.WriteLine(jsonToPost);
             return jsonToPost;
@@ -179,6 +189,29 @@ namespace Jira___Azure_migration
                 formated = desc.Replace(file, $"<a href='{a}' target='_blank'>{file}</a>");
             }
             return formated;
+        }
+
+        public string translateDateTimeToAzure(string date)
+        {
+            if (!String.IsNullOrEmpty(date))
+            {
+                date = DateTime.SpecifyKind(DateTime.Parse(date), DateTimeKind.Utc).ToString("s") + ".000Z";
+            }
+            return date;
+        }
+        
+        public string getWorkLog(string wl, string total)
+        {
+            string workLogString = "";
+            if (!String.IsNullOrEmpty(wl))
+            {
+                foreach (string log in wl.Split(';'))
+                {
+                    workLogString += $"{log} <br> ";
+                }
+                workLogString += $"Soit un total de <strong>{total} heures </strong>";
+            }
+            return workLogString;
         }
     }
 }
